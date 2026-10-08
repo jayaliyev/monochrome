@@ -36,7 +36,7 @@ echo "Using: $NAME ($RUNTIME) $UDID"
 mkdir -p "$OUT_DIR"
 echo "$NAME / $RUNTIME / $UDID" > "$OUT_DIR/sim-info.txt"
 
-export IOS_TARGET=simulator IOS_TEST=1 SIM_UDID="$UDID"
+export IOS_TARGET=simulator IOS_TEST="${IOS_TEST:-1}" SIM_UDID="$UDID"
 bash scripts/ios/build-ipa.sh
 
 APP="$OUT_DIR/derived/Build/Products/Release-iphonesimulator/App.app"

@@ -5,7 +5,7 @@
 #
 #   IOS_TARGET=device     (default) unsigned .ipa for sideloading (AltStore, Sideloadly, TrollStore, ...)
 #   IOS_TARGET=simulator  .app for the iOS Simulator (used by simulator-test.sh)
-#   IOS_TEST=1            also bundle scripts/ios/test-harness.js (simulator tests only)
+#   IOS_TEST=1|probe      also bundle scripts/ios/test-harness.js (or audio-probe.js); simulator tests only
 #
 # Output (device): build-ios/Monochrome-<version>-unsigned.ipa
 set -euo pipefail
@@ -29,12 +29,16 @@ fi
 echo "==> Building web app"
 npx vite build
 
-if [ "$IOS_TEST" = "1" ]; then
-    echo "==> Injecting simulator test harness"
-    python3 - <<'PY'
-import pathlib
+if [ "$IOS_TEST" != "0" ]; then
+    case "$IOS_TEST" in
+        probe) HARNESS=scripts/ios/audio-probe.js ;;
+        *) HARNESS=scripts/ios/test-harness.js ;;
+    esac
+    echo "==> Injecting simulator test harness ($HARNESS)"
+    HARNESS="$HARNESS" python3 - <<'PY'
+import os, pathlib
 index = pathlib.Path("dist/index.html")
-harness = pathlib.Path("scripts/ios/test-harness.js").read_text()
+harness = pathlib.Path(os.environ["HARNESS"]).read_text()
 html = index.read_text()
 assert "</body>" in html, "dist/index.html has no </body>"
 index.write_text(html.replace("</body>", "<script>\n" + harness + "\n</script>\n</body>", 1))

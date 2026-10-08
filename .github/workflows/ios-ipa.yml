@@ -79,6 +79,9 @@ jobs:
                   bun add -d "@capacitor/cli@$(node -p "require('@capacitor/ios/package.json').version")"
 
             - name: Run in iOS Simulator
+              env:
+                  IOS_TEST: ${{ vars.IOS_TEST || '1' }}
+                  DURATION: ${{ vars.SIM_DURATION || '110' }}
               run: bash scripts/ios/simulator-test.sh
 
             - name: Upload simulator screenshots and logs
