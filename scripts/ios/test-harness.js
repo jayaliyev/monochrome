@@ -94,7 +94,7 @@
             }
         }, seconds * 1000);
 
-    // Timeline (seconds after page load)
+    // Timeline (seconds after page load). Scenes last >= 20s because each screenshot takes several seconds.
     at(10, 'search', () => go('/search/daft%20punk'));
     at(18, 'play', () => click('.track-item[data-track-id]'));
     at(26, 'play-retry', () => {
@@ -105,13 +105,13 @@
                 .dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
         }
     });
-    at(46, 'fullscreen', () => click('.now-playing-bar .cover'));
+    at(44, 'fullscreen', () => click('.now-playing-bar .cover'));
     // The one-time visualizer warning is position:fixed, so offsetParent is null even when visible.
-    at(50, 'accept-warning', () => document.getElementById('epilepsy-accept-btn')?.click());
-    at(62, 'close-fullscreen', () => click('#close-fullscreen-cover-btn'));
-    at(68, 'library', () => go('/library'));
-    at(76, 'settings', () => go('/settings'));
-    at(84, 'more', () => click('#ios-tabbar button[data-tab="more"]'));
-    at(94, 'close-more', () => click('#sidebar-overlay'));
-    at(98, 'home', () => go('/'));
+    at(48, 'accept-warning', () => document.getElementById('epilepsy-accept-btn')?.click());
+    at(100, 'close-fullscreen', () => click('#close-fullscreen-cover-btn'));
+    at(108, 'library', () => go('/library'));
+    at(130, 'settings', () => go('/settings'));
+    at(152, 'more', () => click('#ios-tabbar button[data-tab="more"]'));
+    at(172, 'close-more', () => click('#sidebar-overlay'));
+    at(176, 'home', () => go('/'));
 })();

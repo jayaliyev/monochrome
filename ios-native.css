@@ -469,7 +469,18 @@ html.native-ios .sidebar {
     backdrop-filter: saturate(180%) blur(30px);
 }
 
+/* "Download the app" makes no sense inside the app. */
+html.native-ios #sidebar-nav-mobile {
+    display: none;
+}
+
+/* Drawer and its scrim cover the tab bar too (otherwise the bottom menu items sit underneath it). */
+html.native-ios .sidebar {
+    z-index: 2300;
+}
+
 html.native-ios #sidebar-overlay {
+    z-index: 2250;
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
 }

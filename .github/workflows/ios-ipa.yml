@@ -81,7 +81,7 @@ jobs:
             - name: Run in iOS Simulator
               env:
                   IOS_TEST: ${{ vars.IOS_TEST || '1' }}
-                  DURATION: ${{ vars.SIM_DURATION || '110' }}
+                  DURATION: ${{ vars.SIM_DURATION || '150' }}
               run: bash scripts/ios/simulator-test.sh
 
             - name: Upload simulator screenshots and logs
