@@ -1,0 +1,497 @@
+/*
+ * iOS app shell design layer.
+ * Every rule is scoped to html.native-ios, which index.html only sets inside the Capacitor app
+ * (or on the web with ?native-ios), so the website itself is unchanged.
+ */
+
+html.native-ios {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --ios-tab-h: 52px;
+    --ios-mini-h: 64px;
+    --ios-edge: 12px;
+    --ios-header-h: calc(var(--sat) + 62px);
+    --ios-bottom-stack: calc(var(--ios-tab-h) + var(--sab));
+    --ios-glass: color-mix(in srgb, var(--card) 66%, transparent);
+    --ios-glass-bar: color-mix(in srgb, var(--background) 76%, transparent);
+    --ios-hairline: color-mix(in srgb, var(--foreground) 13%, transparent);
+    --ios-fill: color-mix(in srgb, var(--foreground) 9%, transparent);
+    --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --font-family: -apple-system, blinkmacsystemfont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+}
+
+/* ---------- Base: behave like an app, not a web page ---------- */
+
+html.native-ios,
+html.native-ios body {
+    background: var(--background);
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: 100%;
+}
+
+html.native-ios body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+html.native-ios input,
+html.native-ios textarea,
+html.native-ios [contenteditable='true'],
+html.native-ios .lyrics-content,
+html.native-ios .am-lyrics {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+html.native-ios input,
+html.native-ios select,
+html.native-ios textarea {
+    font-size: 16px; /* stops iOS zooming into focused fields */
+}
+
+html.native-ios button,
+html.native-ios a,
+html.native-ios .track-item,
+html.native-ios .card {
+    touch-action: manipulation;
+}
+
+/* Page scrolls with the document; keep sticky/fixed children out of nested scroll containers. */
+html.native-ios .main-content {
+    overflow-x: clip;
+    overflow-y: visible;
+    padding: calc(var(--ios-header-h) + 16px) 16px calc(var(--ios-bottom-stack) + var(--ios-mini-h) + 34px);
+}
+
+/* ---------- Top bar: frosted, safe-area aware, search-first ---------- */
+
+html.native-ios .main-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 1500;
+    margin: 0;
+    padding: calc(var(--sat) + 8px) 16px 10px;
+    gap: 10px;
+    align-items: center;
+    background: var(--ios-glass-bar);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    backdrop-filter: saturate(180%) blur(24px);
+    border-bottom: 0.5px solid var(--ios-hairline);
+}
+
+html.native-ios .hamburger-menu {
+    display: none !important; /* replaced by the "More" tab */
+}
+
+html.native-ios .search-bar {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    margin: 0;
+}
+
+html.native-ios .search-bar input {
+    height: 42px;
+    padding-left: 40px;
+    border: 0;
+    border-radius: 13px;
+    background: var(--ios-fill);
+    color: var(--foreground);
+    box-shadow: none;
+}
+
+html.native-ios .search-bar input::placeholder {
+    color: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+html.native-ios .search-bar .search-icon {
+    left: 13px;
+    width: 18px;
+    height: 18px;
+    opacity: 0.55;
+}
+
+html.native-ios .header-account-control {
+    flex: none;
+}
+
+/* ---------- Home: segmented pills instead of an underlined tab strip ---------- */
+
+html.native-ios .home-header-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0 -16px;
+    padding: 6px 16px 14px;
+    overflow-x: auto;
+    border: 0;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+html.native-ios .home-header-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+html.native-ios .home-tab {
+    flex: none;
+    height: 34px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ios-fill);
+    color: color-mix(in srgb, var(--foreground) 68%, transparent);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition:
+        background 0.2s var(--ios-ease),
+        color 0.2s var(--ios-ease),
+        transform 0.15s var(--ios-ease);
+}
+
+html.native-ios .home-tab::after,
+html.native-ios .home-tab::before {
+    display: none;
+}
+
+html.native-ios .home-tab.active {
+    background: var(--foreground);
+    color: var(--background);
+}
+
+html.native-ios .home-tab:active {
+    transform: scale(0.95);
+}
+
+/* ---------- Typography ---------- */
+
+html.native-ios .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+html.native-ios .detail-header .title,
+html.native-ios .detail-header h1 {
+    letter-spacing: -0.03em;
+}
+
+/* ---------- Lists & cards: roomier touch targets ---------- */
+
+html.native-ios .track-item {
+    min-height: 60px;
+    border-radius: 12px;
+    transition: background 0.15s var(--ios-ease);
+}
+
+html.native-ios .track-item:active {
+    background: var(--ios-fill);
+}
+
+html.native-ios .track-item-cover {
+    border-radius: 8px;
+}
+
+html.native-ios .card {
+    border-radius: 16px;
+    transition: transform 0.2s var(--ios-ease);
+}
+
+html.native-ios .card:active {
+    transform: scale(0.97);
+}
+
+html.native-ios .card .card-image,
+html.native-ios .card img {
+    border-radius: 12px;
+}
+
+html.native-ios button:active:not(.home-tab):not([data-tab]) {
+    opacity: 0.7;
+}
+
+/* ---------- Bottom tab bar ---------- */
+
+#ios-tabbar {
+    display: none;
+}
+
+html.native-ios #ios-tabbar {
+    display: flex;
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 2200;
+    padding: 6px 6px calc(var(--sab) + 2px);
+    background: var(--ios-glass-bar);
+    -webkit-backdrop-filter: saturate(180%) blur(28px);
+    backdrop-filter: saturate(180%) blur(28px);
+    border-top: 0.5px solid var(--ios-hairline);
+    transition: transform 0.35s var(--ios-ease);
+}
+
+html.native-ios #ios-tabbar button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-height: 44px;
+    padding: 2px 0 0;
+    border: 0;
+    background: none;
+    color: color-mix(in srgb, var(--foreground) 50%, transparent);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition:
+        color 0.2s var(--ios-ease),
+        transform 0.2s var(--ios-ease);
+}
+
+html.native-ios #ios-tabbar button svg {
+    width: 25px;
+    height: 25px;
+    stroke-width: 1.9;
+    transition: stroke-width 0.2s var(--ios-ease);
+}
+
+html.native-ios #ios-tabbar button[aria-current='page'] {
+    color: var(--foreground);
+}
+
+html.native-ios #ios-tabbar button[aria-current='page'] svg {
+    stroke-width: 2.4;
+}
+
+html.native-ios #ios-tabbar button:active {
+    transform: scale(0.9);
+}
+
+/* ---------- Mini player: one compact floating glass pill ---------- */
+
+html.native-ios .now-playing-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    inset: auto var(--ios-edge) calc(var(--ios-bottom-stack) + 8px) var(--ios-edge) !important;
+    width: auto !important;
+    height: var(--ios-mini-h) !important;
+    padding: 8px 8px 8px 8px;
+    border: 0.5px solid var(--ios-hairline);
+    border-radius: 22px;
+    background: var(--ios-glass);
+    -webkit-backdrop-filter: saturate(180%) blur(30px);
+    backdrop-filter: saturate(180%) blur(30px);
+    box-shadow:
+        0 12px 32px rgb(0 0 0 / 0.45),
+        0 1px 0 rgb(255 255 255 / 0.05) inset;
+    overflow: hidden;
+    z-index: 2100;
+}
+
+html.native-ios .now-playing-bar .track-info {
+    flex: 1;
+    min-width: 0;
+    gap: 12px;
+    align-items: center;
+}
+
+html.native-ios .now-playing-bar .track-info .cover {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 11px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.4);
+}
+
+html.native-ios .now-playing-bar .track-info .cover::after {
+    display: none;
+}
+
+html.native-ios .now-playing-bar .details {
+    min-width: 0;
+}
+
+html.native-ios .now-playing-bar .details .title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+html.native-ios .now-playing-bar .details .artist {
+    font-size: 13px;
+    color: var(--muted-foreground);
+}
+
+html.native-ios .now-playing-bar .details .album,
+html.native-ios .now-playing-bar .details .quality-badge {
+    display: none;
+}
+
+/* Secondary controls live in the full-screen player. */
+html.native-ios .now-playing-bar .volume-controls,
+html.native-ios .now-playing-bar #shuffle-btn,
+html.native-ios .now-playing-bar #repeat-btn,
+html.native-ios .now-playing-bar #prev-btn,
+html.native-ios .now-playing-bar #progress-container-time,
+html.native-ios .now-playing-bar #current-time,
+html.native-ios .now-playing-bar #total-duration {
+    display: none !important;
+}
+
+html.native-ios .now-playing-bar .player-controls {
+    flex: none;
+    width: auto;
+    padding: 0;
+    gap: 0;
+}
+
+html.native-ios .now-playing-bar .player-controls .buttons {
+    padding: 0;
+    gap: 2px;
+}
+
+html.native-ios .now-playing-bar .player-controls .buttons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--foreground);
+    box-shadow: none;
+}
+
+html.native-ios .now-playing-bar .player-controls .buttons .play-pause-btn {
+    background: transparent;
+    color: var(--foreground);
+}
+
+html.native-ios .now-playing-bar .player-controls .buttons svg {
+    width: 26px;
+    height: 26px;
+}
+
+/* Progress becomes a hairline along the bottom edge of the pill. */
+html.native-ios .now-playing-bar .player-controls .progress-container {
+    position: absolute;
+    inset: auto 16px 4px;
+    height: 3px;
+    max-width: none;
+    padding: 0;
+    pointer-events: none;
+}
+
+html.native-ios .now-playing-bar .progress-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--ios-hairline);
+}
+
+html.native-ios .now-playing-bar .progress-fill {
+    border-radius: 2px;
+    background: var(--foreground);
+}
+
+html.native-ios .now-playing-bar .progress-bar::after,
+html.native-ios .now-playing-bar .progress-fill::after {
+    display: none;
+}
+
+/* Hide the bars while the full-screen player is up. */
+html.native-ios body:has(#fullscreen-cover-overlay:not([style*='display: none'])) #ios-tabbar {
+    transform: translateY(110%);
+}
+
+/* ---------- Full-screen player ---------- */
+
+/* Queue shortcut, top-left corner of the full-screen player (the app has no queue button there). */
+#ios-fs-queue-btn {
+    display: none;
+}
+
+html.native-ios #ios-fs-queue-btn {
+    display: flex;
+    position: absolute;
+    z-index: 20;
+    top: calc(0.85rem + env(safe-area-inset-top, 0px));
+    left: calc(1rem + env(safe-area-inset-left, 0px));
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--foreground) 14%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    color: var(--foreground);
+}
+
+html.native-ios #ios-fs-queue-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+html.native-ios #fullscreen-cover-image {
+    border-radius: 22px;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.55);
+}
+
+html.native-ios #fullscreen-track-title {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+html.native-ios .fullscreen-buttons button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+html.native-ios .fullscreen-buttons .play-pause-btn,
+html.native-ios #fs-play-pause-btn {
+    width: 72px;
+    height: 72px;
+    box-shadow: 0 10px 28px rgb(0 0 0 / 0.4);
+}
+
+/* ---------- Sidebar drawer ("More") ---------- */
+
+html.native-ios .sidebar {
+    padding-top: var(--sat);
+    padding-bottom: var(--sab);
+    -webkit-backdrop-filter: saturate(180%) blur(30px);
+    backdrop-filter: saturate(180%) blur(30px);
+}
+
+html.native-ios #sidebar-overlay {
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+/* ---------- Toasts / notifications sit above the bars ---------- */
+
+html.native-ios #download-notifications {
+    bottom: calc(var(--ios-bottom-stack) + var(--ios-mini-h) + 20px);
+}
+
+/* Respect the app's "disable blur" preference. */
+html.native-ios.disable-blur-effects .main-header,
+html.native-ios.disable-blur-effects #ios-tabbar,
+html.native-ios.disable-blur-effects .now-playing-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.native-ios * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
