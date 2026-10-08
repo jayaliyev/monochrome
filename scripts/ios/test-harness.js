@@ -106,10 +106,8 @@
         }
     });
     at(46, 'fullscreen', () => click('.now-playing-bar .cover'));
-    at(50, 'accept-warning', () => {
-        const accept = document.getElementById('epilepsy-accept-btn');
-        if (accept && accept.offsetParent !== null) accept.click();
-    });
+    // The one-time visualizer warning is position:fixed, so offsetParent is null even when visible.
+    at(50, 'accept-warning', () => document.getElementById('epilepsy-accept-btn')?.click());
     at(62, 'close-fullscreen', () => click('#close-fullscreen-cover-btn'));
     at(68, 'library', () => go('/library'));
     at(76, 'settings', () => go('/settings'));

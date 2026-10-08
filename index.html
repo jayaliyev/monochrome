@@ -160,6 +160,70 @@
                 } catch {}
             })();
         </script>
+        <script>
+            // iOS WebKit refuses audio.src = <extension-less URL served as application/octet-stream> with
+            // MEDIA_ERR_SRC_NOT_SUPPORTED. tracks.monochrome.st serves FLAC exactly like that, so inside the app
+            // we hand those streams to the element as <source type="audio/flac">, which iOS accepts (verified in
+            // the iOS Simulator). Everything else (blob:, HLS, other hosts) keeps the native `src` behaviour.
+            (() => {
+                try {
+                    if (!document.documentElement.classList.contains('native-ios')) return;
+                    const proto = HTMLMediaElement.prototype;
+                    const srcDesc = Object.getOwnPropertyDescriptor(proto, 'src');
+                    if (!srcDesc || !srcDesc.set) return;
+
+                    const STREAM = /^https:\/\/tracks\.monochrome\.st\/track\//;
+                    const logicalSrc = new WeakMap();
+                    const clearSources = (el) => {
+                        for (const s of Array.from(el.children)) if (s.tagName === 'SOURCE') s.remove();
+                    };
+                    const nativeRemove = Element.prototype.removeAttribute;
+                    const nativeSet = Element.prototype.setAttribute;
+
+                    Object.defineProperty(proto, 'src', {
+                        configurable: true,
+                        enumerable: srcDesc.enumerable,
+                        get() {
+                            return logicalSrc.has(this) ? logicalSrc.get(this) : srcDesc.get.call(this);
+                        },
+                        set(value) {
+                            const url = String(value == null ? '' : value);
+                            clearSources(this);
+                            if (!STREAM.test(url)) {
+                                logicalSrc.delete(this);
+                                srcDesc.set.call(this, value);
+                                return;
+                            }
+                            logicalSrc.set(this, url);
+                            nativeRemove.call(this, 'src');
+                            const source = document.createElement('source');
+                            source.type = 'audio/flac';
+                            source.src = url;
+                            // Failures of a <source> only fire on the <source>; the app listens on the element.
+                            source.addEventListener('error', () => this.dispatchEvent(new Event('error')));
+                            this.appendChild(source);
+                            this.load();
+                        },
+                    });
+                    proto.removeAttribute = function (name) {
+                        if (String(name).toLowerCase() === 'src') {
+                            logicalSrc.delete(this);
+                            clearSources(this);
+                        }
+                        return nativeRemove.call(this, name);
+                    };
+                    proto.setAttribute = function (name, value) {
+                        if (String(name).toLowerCase() === 'src') {
+                            this.src = value;
+                            return;
+                        }
+                        return nativeSet.call(this, name, value);
+                    };
+                } catch (e) {
+                    console.error('native audio shim failed', e);
+                }
+            })();
+        </script>
         <script type="module" src="/js/app.js"></script>
         <script type="module" src="/js/native-ios.js"></script>
         <link rel="stylesheet" href="/styles.css" />
