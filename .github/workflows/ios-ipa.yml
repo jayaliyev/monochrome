@@ -34,7 +34,7 @@ jobs:
             - name: Install dependencies
               run: |
                   bun install
-                  bun add -d @capacitor/cli@^8
+                  bun add -d "@capacitor/cli@$(node -p "require('@capacitor/ios/package.json').version")"
 
             - name: Build IPA
               env:

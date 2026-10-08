@@ -13,9 +13,12 @@ VERSION="$(node -p "require('./package.json').version")"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
 OUT_DIR="${OUT_DIR:-build-ios}"
 
+# The CLI generates the native template, so it must match the installed @capacitor/ios version exactly
+# (a newer CLI emits Swift that older @capacitor/ios releases don't provide).
+CAP_VERSION="$(node -p "require('@capacitor/ios/package.json').version")"
 if [ ! -x node_modules/.bin/cap ]; then
-    echo "==> Installing @capacitor/cli (not a dependency of the project)"
-    npm install --no-save --no-package-lock --legacy-peer-deps @capacitor/cli@^8
+    echo "==> Installing @capacitor/cli@${CAP_VERSION} (not a dependency of the project)"
+    npm install --no-save --no-package-lock --legacy-peer-deps "@capacitor/cli@${CAP_VERSION}"
 fi
 
 echo "==> Building web app"
