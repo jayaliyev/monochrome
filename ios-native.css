@@ -124,7 +124,7 @@ html.native-ios .home-header-tabs {
     display: flex;
     gap: 8px;
     margin: 0 -16px;
-    padding: 6px 16px 14px;
+    padding: 6px 16px 20px;
     overflow-x: auto;
     border: 0;
     scrollbar-width: none;
@@ -327,8 +327,9 @@ html.native-ios .now-playing-bar .details .artist {
 }
 
 html.native-ios .now-playing-bar .details .album,
-html.native-ios .now-playing-bar .details .quality-badge {
-    display: none;
+html.native-ios .now-playing-bar .details .quality-badge,
+html.native-ios .now-playing-bar .quality-badge {
+    display: none !important;
 }
 
 /* Secondary controls live in the full-screen player. */

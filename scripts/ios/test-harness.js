@@ -8,6 +8,12 @@
     const events = [];
     const errors = [];
 
+    // The CI simulator renders WebGL in software, which stalls screenshots for over a minute while the
+    // full-screen visualizer runs. Turn it off so the player layout itself can be captured.
+    try {
+        localStorage.setItem('visualizer-enabled', 'false');
+    } catch {}
+
     const box = document.createElement('div');
     box.style.cssText = [
         'position:fixed',
